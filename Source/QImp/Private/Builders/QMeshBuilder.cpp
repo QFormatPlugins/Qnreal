@@ -25,7 +25,7 @@ void FQMeshBuilder::ProcessEntity(const qformats::map::SolidEntityPtr& Entity)
 	{
 		for (const auto& Face : Brush.GetFaces())
 		{
-			if (Face->Type() == qformats::map::Face::CLIP || Face->Type() == qformats::map::Face::SKIP)
+			if (Face->Type() == qformats::map::Face::CLIP)
 			{
 				bHasClipMesh = true;
 				AddFacetoRawMesh(Face, ClipMesh);
@@ -39,7 +39,7 @@ void FQMeshBuilder::AddFacetoRawMesh(const qformats::map::FacePtr& Face, FRawMes
 	const auto& vertices = Face->GetVertices();
 	const auto& indices = Face->GetIndices();
 
-	
+
 	for (int i = vertices.size() - 1; i >= 0; i--)
 	{
 		auto pt = vertices[i].point;
@@ -150,8 +150,6 @@ void FQMeshBuilder::SetupRenderSourceModel(UStaticMesh* Mesh, float LightMapDivi
 	Mesh->SetLightMapResolution(LightMapEstimate);
 	Mesh->bCustomizedCollision = false;
 	Mesh->ComplexCollisionMesh = Mesh;
-	Mesh->Build(true);
-	Mesh->PostEditChange();
 	Mesh->SetLightingGuid();
 }
 
@@ -161,12 +159,12 @@ void FQMeshBuilder::SetupClippingSourceModel(UStaticMesh* Mesh)
 	{
 		return;
 	}
-	
+
 	Mesh->AddSourceModel();
 	auto& SrcModel = Mesh->GetSourceModel(0);
 	SrcModel.BuildSettings.bUseHighPrecisionTangentBasis = false;
-	SrcModel.BuildSettings.bRecomputeNormals = true;
-	SrcModel.BuildSettings.bRecomputeTangents = true;
+	SrcModel.BuildSettings.bRecomputeNormals = false;
+	SrcModel.BuildSettings.bRecomputeTangents = false;
 	SrcModel.BuildSettings.bUseFullPrecisionUVs = false;
 	SrcModel.BuildSettings.bGenerateLightmapUVs = false;
 	SrcModel.BuildSettings.MinLightmapResolution = 0;
@@ -190,6 +188,4 @@ void FQMeshBuilder::SetupClippingSourceModel(UStaticMesh* Mesh)
 	Mesh->SetLightMapResolution(0);
 	Mesh->bCustomizedCollision = false;
 	Mesh->ComplexCollisionMesh = Mesh;
-	Mesh->PostEditChange();
-	Mesh->Build(true);
 }

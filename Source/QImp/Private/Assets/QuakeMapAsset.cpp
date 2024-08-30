@@ -21,7 +21,7 @@ qformats::map::textureBounds UQuakeMapAsset::onTextureRequest(std::string name)
 		Material->GetTextureParameterValue(paramInfo, TmpTex);
 		texture = Cast<UTexture2D>(TmpTex);
 	}
-	
+
 	auto MaterialInstance = UMaterialInstanceDynamic::Create(Material, this);
 	auto metatex = qformats::map::textureBounds{.width = 128, .height = 128};
 	if (texture != nullptr)
@@ -46,7 +46,7 @@ fvec3 UQuakeMapAsset::CalculateEntityPivot(const qformats::map::SolidEntityPtr& 
 	}
 
 	fvec3 PivotVec = Entity->GetMin();
-	
+
 	switch (Pivot)
 	{
 	case Lower_Left:
@@ -139,9 +139,20 @@ void UQuakeMapAsset::LoadMapFromFile(FString fileName)
 	}
 	FWadManager::GetInstance()->Refresh(AssetRegistryModule);
 	auto NativeMap = new qformats::map::QMap();
+
+	double TimerMapLoadStart = FPlatformTime::Seconds();
+
+	if (!Options.BaseMaterial->IsValidLowLevel())
+	{
+		Options.BaseMaterial = static_cast<UMaterial*>(StaticLoadObject(UMaterial::StaticClass(), nullptr,
+		                                                                TEXT("/QImp/Materials/M_WadMaster"), nullptr,
+		                                                                LOAD_None, nullptr));
+	}
+
 	NativeMap->LoadFile(
 		std::string(TCHAR_TO_UTF8(*fileName)),
-		[this](const char* name) -> qformats::map::textureBounds {
+		[this](const char* name) -> qformats::map::textureBounds
+		{
 			return this->onTextureRequest(name);
 		});
 
@@ -151,24 +162,19 @@ void UQuakeMapAsset::LoadMapFromFile(FString fileName)
 		return;
 	}
 
-	if (!Options.BaseMaterial->IsValidLowLevel())
-	{
-		Options.BaseMaterial = static_cast<UMaterial*>(StaticLoadObject(UMaterial::StaticClass(), nullptr,
-		                                                                TEXT("/QUnreal/Materials/M_WadMaster"), nullptr,
-		                                                                LOAD_None, nullptr));
-	}
-
 	MarkTexture(NativeMap, Options.SkyTexture, qformats::map::Face::NODRAW);
 	MarkTexture(NativeMap, Options.SkipTexture, qformats::map::Face::SKIP);
 	MarkTexture(NativeMap, Options.ClipTexture, qformats::map::Face::CLIP);
 
 	NativeMap->GenerateGeometry();
 
+	double TimerMapLoadEnd = FPlatformTime::Seconds();
+	UE_LOG(LogTemp, Warning, TEXT("TIMEMESS: native map loaded in %f seconds."), TimerMapLoadEnd-TimerMapLoadStart);
+
 	if (NativeMap->GetSolidEntities().size() == 0 || NativeMap->WorldSpawn() == nullptr)
 	{
 		return;
 	}
-
 
 	if (NativeMap->WorldSpawn()->attributes.contains("qu_meshlib"))
 	{
@@ -178,20 +184,38 @@ void UQuakeMapAsset::LoadMapFromFile(FString fileName)
 	MapData->SolidEntities.Empty();
 	MapData->PointEntities.Empty();
 	EntityClassCount.clear();
+	TArray<UStaticMesh*> StaticMeshes;
+	TimerMapLoadStart = FPlatformTime::Seconds();
 
-	ConvertEntityToModel(NativeMap->GetSolidEntities()[0], MapData->WorldSpawn,Center);
-	
+	ConvertEntityToModel(NativeMap->GetSolidEntities()[0], MapData->WorldSpawn, Center, false);
+	StaticMeshes.Add(MapData->WorldSpawn.Mesh);
+	StaticMeshes.Add(MapData->WorldSpawn.ClipMesh);
+	TimerMapLoadEnd = FPlatformTime::Seconds();
+	UE_LOG(LogTemp, Warning, TEXT("TIMEMESS: worldspawn built in %f seconds."), TimerMapLoadEnd-TimerMapLoadStart);
+
+	TimerMapLoadStart = FPlatformTime::Seconds();
 	for (int i = 1; i < NativeMap->GetSolidEntities().size(); i++)
 	{
 		auto NativeSolidEntity = NativeMap->GetSolidEntities()[i];
 		FSolidEntity NewSolidEntity{};
+		
+		bool bExport = NativeSolidEntity->attributes.contains("qu_export");
 		CreateEntityFromNative(&NewSolidEntity, NativeSolidEntity, Options.InverseScale);
-		ConvertEntityToModel(NativeSolidEntity, NewSolidEntity,Options.DefaultPivot);
+		ConvertEntityToModel(NativeSolidEntity, NewSolidEntity, Options.DefaultPivot, bExport);
+		
 		if (NewSolidEntity.Mesh == nullptr)
 		{
 			continue;
 		}
-
+		StaticMeshes.Add(NewSolidEntity.Mesh);
+		if (NewSolidEntity.ClipMesh != nullptr)
+		{
+			StaticMeshes.Add(NewSolidEntity.ClipMesh);
+		}
+		if (bExport)
+		{
+			continue;
+		}
 		NewSolidEntity.Type = EntityType_Solid;
 		NewSolidEntity.ClassTemplate = AQSolidEntityActor::StaticClass();
 		if (Options.EntityClassOverrides != nullptr && Options.EntityClassOverrides->Classes.Contains(
@@ -209,6 +233,10 @@ void UQuakeMapAsset::LoadMapFromFile(FString fileName)
 
 		MapData->SolidEntities.Emplace(NewSolidEntity);
 	}
+
+	UStaticMesh::BatchBuild(StaticMeshes);
+	TimerMapLoadEnd = FPlatformTime::Seconds();
+	UE_LOG(LogTemp, Warning, TEXT("TIMEMESS: entities built in %f seconds."), TimerMapLoadEnd-TimerMapLoadStart);
 
 	if (!bImportAsStaticMeshLib)
 	{
@@ -308,15 +336,16 @@ void UQuakeMapAsset::Serialize(FArchive& Ar)
 	UObject::Serialize(Ar);
 }
 
-void UQuakeMapAsset::ConvertEntityToModel(const qformats::map::SolidEntityPtr& Entity, FSolidEntity& OutEntity, EQuakeEntityPivot PivotOpt)
+void UQuakeMapAsset::ConvertEntityToModel(const qformats::map::SolidEntityPtr& Entity, FSolidEntity& OutEntity,
+                                          EQuakeEntityPivot PivotOpt, bool bExport)
 {
 	auto b0 = Entity.get()->GetClippedBrushes()[0];
 	FVector3d Min(b0.min.x(), b0.min.y(), b0.min.z());
 	FVector3d Max(b0.max.x(), b0.max.y(), b0.max.z());
 	fvec3 Pivot = CalculateEntityPivot(Entity, PivotOpt);
 	FQMeshBuilder builder(Materials);
-
-	if (bImportAsStaticMeshLib)
+	
+	if (bImportAsStaticMeshLib || bExport)
 	{
 		builder.SetVertexOffset(Pivot);
 	}
@@ -328,18 +357,18 @@ void UQuakeMapAsset::ConvertEntityToModel(const qformats::map::SolidEntityPtr& E
 	{
 		return;
 	}
-	
+
 	auto entCenter = Entity->GetCenter();
 	OutEntity.Center = FVector3d(-entCenter.x(), entCenter.y(), entCenter.z()) / Options.InverseScale;
 	OutEntity.Pivot = FVector3d(-Pivot.x(), Pivot.y(), Pivot.z()) / Options.InverseScale;
-	
+
 	auto MapName = FPaths::GetBaseFilename(SourceQMapFile);
-	
+
 	FString MeshName = GetUniqueEntityName(Entity.get()->ClassName());
 	OutEntity.UniqueClassName = FString(MeshName);
 	FString PackagePath = this->GetPackage()->GetPathName();
-	
-	if (bImportAsStaticMeshLib)
+
+	if (bImportAsStaticMeshLib || bExport)
 	{
 		if (!Entity->tbName.empty())
 		{
@@ -358,9 +387,10 @@ void UQuakeMapAsset::ConvertEntityToModel(const qformats::map::SolidEntityPtr& E
 	FAssetRegistryModule::AssetCreated(Mesh);
 	builder.SetupRenderSourceModel(Mesh, Options.LightMapDivider, Options.MaxLightmapSize);
 
-	if (!bImportAsStaticMeshLib && builder.HasClipMesh()) {
-
-		UStaticMesh* ClipMesh = NewObject<UStaticMesh>(Pkg, *MeshName.Append("_Clip"), RF_Public | RF_Standalone | RF_MarkAsRootSet);
+	if (!bExport && !bImportAsStaticMeshLib && builder.HasClipMesh())
+	{
+		UStaticMesh* ClipMesh = NewObject<UStaticMesh>(Pkg, *MeshName.Append("_Clip"),
+		                                               RF_Public | RF_Standalone | RF_MarkAsRootSet);
 		FAssetRegistryModule::AssetCreated(ClipMesh);
 		builder.SetupClippingSourceModel(ClipMesh);
 		OutEntity.ClipMesh = ClipMesh;
@@ -409,8 +439,8 @@ static bool PathContains(FString full, FString part)
 
 	for (int i = 0; i < partSegs.Num(); i++)
 	{
-		auto baseFileName = FPaths::GetBaseFilename(fullSegs[fullSegs.Num()-(i+1)]);
-		if (!partSegs[partSegs.Num()-(i+1)].Equals(baseFileName))
+		auto baseFileName = FPaths::GetBaseFilename(fullSegs[fullSegs.Num() - (i + 1)]);
+		if (!partSegs[partSegs.Num() - (i + 1)].Equals(baseFileName))
 		{
 			return false;
 		}
@@ -434,7 +464,7 @@ UTexture2D* UQuakeMapAsset::FindTexture2D(const char* Name)
 		{
 			for (const auto& Obj : ObjectList)
 			{
-				if (Obj.GetClass() == UTexture2D::StaticClass() && PathContains(Obj.GetFullName(),FString(Name)))
+				if (Obj.GetClass() == UTexture2D::StaticClass() && PathContains(Obj.GetFullName(), FString(Name)))
 				{
 					texture = Cast<UTexture2D>(Obj.GetAsset());
 					break;
@@ -470,7 +500,7 @@ UMaterial* UQuakeMapAsset::FindMaterial(const char* Name)
 		{
 			for (const auto& Obj : ObjectList)
 			{
-				if (Obj.GetClass() == UMaterial::StaticClass() && PathContains(Obj.GetFullName(),FString(Name)))
+				if (Obj.GetClass() == UMaterial::StaticClass() && PathContains(Obj.GetFullName(), FString(Name)))
 				{
 					Material = Cast<UMaterial>(Obj.GetAsset());
 					MaterialOverrideCache.Add(FString(Name), Material);
@@ -479,6 +509,6 @@ UMaterial* UQuakeMapAsset::FindMaterial(const char* Name)
 			}
 		}
 	}
-	
+
 	return Material;
 }

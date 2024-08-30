@@ -46,7 +46,7 @@ public:
 
 private:
 	void Reset();
-	void ConvertEntityToModel(const qformats::map::SolidEntityPtr &ent, FSolidEntity& OutEntity, EQuakeEntityPivot PivotOpt);
+	void ConvertEntityToModel(const qformats::map::SolidEntityPtr &ent, FSolidEntity& OutEntity, EQuakeEntityPivot PivotOpt, bool bExport);
 	FString GetUniqueEntityName(const std::string &ClassName);
 	static void MarkTexture(qformats::map::QMap *NativeMap, const FString &TextureName, qformats::map::Face::eFaceType t);
 	UTexture2D* FindTexture2D(const char* Name);

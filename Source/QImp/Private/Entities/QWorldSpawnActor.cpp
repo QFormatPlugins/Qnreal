@@ -11,6 +11,7 @@ AQWorldSpawnActor::AQWorldSpawnActor()
 	WorldSpawnClipMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WorldSpawnClipMesh"));
 	WorldSpawnClipMeshComponent->SetMobility(EComponentMobility::Static);
 	WorldSpawnClipMeshComponent->bHiddenInGame = true;
+	WorldSpawnClipMeshComponent->SetVisibility(false);
 	PrimaryActorTick.bCanEverTick = false;
 }
 
