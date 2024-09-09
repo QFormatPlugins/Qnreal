@@ -6,7 +6,7 @@
 
 ### Quake (Trenchbroom) Map and WAD importer for Unreal Eninge 5.
 
-<img src="https://github.com/QFormatPlugins/QnrealUE/blob/main/.media/logo.png?raw=true" alt="qunreal_logo" width="60%" height=60%/>
+<img src="https://github.com/QFormatPlugins/Qnreal/blob/main/.media/logo.png?raw=true" alt="qunreal_logo" width="60%" height=60%/>
 
 ## Installation:
 
@@ -14,13 +14,13 @@
 * clone the repository into the `Plugins` folder via git:
 
 ```bash
-git clone https://github.com/QFormatPlugins/QnrealUE
+git clone https://github.com/QFormatPlugins/Qnreal
 ```
 * Activate the QUnreal Plugin via editor or your project config file.
 
 ## Documentation:
 
-[Read the Wiki](https://github.com/QFormatPlugins/QnrealUE/wiki)
+[Read the Wiki](https://github.com/QFormatPlugins/Qnreal/wiki)
 
 ## features:
 
