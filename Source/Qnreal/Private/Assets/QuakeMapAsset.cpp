@@ -134,7 +134,7 @@ void UQuakeMapAsset::LoadMapFromFile(FString fileName)
 	Reset();
 	if (!bOverrideDefaultOptions)
 	{
-		const UQImpSettings* Settings = GetDefault<UQImpSettings>();
+		const UQnrealSettings* Settings = GetDefault<UQnrealSettings>();
 		Options = Settings->MapAssetOptions;
 	}
 	FWadManager::GetInstance()->Refresh(AssetRegistryModule);
@@ -145,7 +145,7 @@ void UQuakeMapAsset::LoadMapFromFile(FString fileName)
 	if (!Options.BaseMaterial->IsValidLowLevel())
 	{
 		Options.BaseMaterial = static_cast<UMaterial*>(StaticLoadObject(UMaterial::StaticClass(), nullptr,
-		                                                                TEXT("/QImp/Materials/M_WadMaster"), nullptr,
+		                                                                TEXT("/Qnreal/Materials/M_WadMaster"), nullptr,
 		                                                                LOAD_None, nullptr));
 	}
 

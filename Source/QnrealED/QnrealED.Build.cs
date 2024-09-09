@@ -1,8 +1,8 @@
 ﻿using UnrealBuildTool;
 
-public class QImpED : ModuleRules
+public class QnrealED : ModuleRules
 {
-    public QImpED(ReadOnlyTargetRules Target) : base(Target)
+    public QnrealED(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
@@ -22,7 +22,7 @@ public class QImpED : ModuleRules
                 "SlateCore",
                 "UnrealEd",
                 "DeveloperSettings",
-                "QImp",
+                "Qnreal",
             }
         );
     }

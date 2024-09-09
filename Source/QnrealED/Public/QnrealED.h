@@ -6,7 +6,7 @@
 
 #include "Modules/ModuleManager.h"
 
-class FQImpEDModule : public IModuleInterface
+class FQnrealEDModule : public IModuleInterface
 {
 public:
     virtual void StartupModule() override;

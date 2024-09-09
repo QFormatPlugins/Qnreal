@@ -1,37 +1,37 @@
-﻿#include "QImpED.h"
+﻿#include "QnrealED.h"
 #include "QuakeWadAssetFactory.h"
-#include "QImpSettings.h"
+#include "QnrealSettings.h"
 #include "ISettingsModule.h"
 
-#define LOCTEXT_NAMESPACE "FQImpEDModule"
+#define LOCTEXT_NAMESPACE "FQnrealEDModule"
 
-void FQImpEDModule::StartupModule()
+void FQnrealEDModule::StartupModule()
 {
 	if(ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 	{
 		SettingsModule->RegisterSettings(
 			"Project",
 			"Plugins",
-			"QImpEditorSettings",
-			LOCTEXT("RuntimeSettingsName", "QImp Settings"),
-			LOCTEXT("RuntimeSettingsDescription", "Configure QImp defaults"),
-			GetMutableDefault<UQImpSettings>()
+			"QnrealEditorSettings",
+			LOCTEXT("RuntimeSettingsName", "Qnreal Settings"),
+			LOCTEXT("RuntimeSettingsDescription", "Configure Qnreal defaults"),
+			GetMutableDefault<UQnrealSettings>()
 			);
 
-		auto Options = GetMutableDefault<UQImpSettings>();
+		auto Options = GetMutableDefault<UQnrealSettings>();
 		
 		if (!Options->bIsInitialized) {
 			Options->MapAssetOptions.BaseMaterial = static_cast<UMaterial*>(
 				StaticLoadObject(UMaterial::StaticClass(),
 					nullptr,
-					TEXT("/QImp/Materials/M_WadMaster"),
+					TEXT("/Qnreal/Materials/M_WadMaster"),
 					nullptr,
 					LOAD_None,
 					nullptr));
 			Options->MapAssetOptions.EntityClassOverrides = static_cast<UQEntityClassesData*>(
 				StaticLoadObject(UQEntityClassesData::StaticClass(),
 					nullptr,
-					TEXT("/QImp/DefaultEntityClasses"),
+					TEXT("/Qnreal/DefaultEntityClasses"),
 					nullptr,
 					LOAD_None,
 					nullptr));
@@ -48,14 +48,14 @@ void FQImpEDModule::StartupModule()
 
 }
 
-void FQImpEDModule::ShutdownModule()
+void FQnrealEDModule::ShutdownModule()
 {
 	if(ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 	{
-		SettingsModule->UnregisterSettings("Project", "Plugins", "QImpEditorSettings");
+		SettingsModule->UnregisterSettings("Project", "Plugins", "QnrealEditorSettings");
 	}
 }
 
 #undef LOCTEXT_NAMESPACE
     
-IMPLEMENT_MODULE(FQImpEDModule, QImpED)
+IMPLEMENT_MODULE(FQnrealEDModule, QnrealED)

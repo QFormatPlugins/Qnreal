@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-class FQImpModule : public IModuleInterface
+class FQnrealModule : public IModuleInterface
 {
 public:
 

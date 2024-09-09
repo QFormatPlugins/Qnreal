@@ -5,7 +5,7 @@
 #include "QSolidEntityActor.generated.h"
 
 UCLASS(Blueprintable)
-class QIMP_API AQSolidEntityActor : public AQEntityActor
+class QNREAL_API AQSolidEntityActor : public AQEntityActor
 {
 	GENERATED_BODY()
 public:
@@ -14,9 +14,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TEnumAsByte<EComponentMobility::Type> Mobility = EComponentMobility::Static;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	UStaticMeshComponent* EntityMeshComponent;
+	UStaticMeshComponent *EntityMeshComponent;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	UStaticMeshComponent* ClipMeshComponent;
-	
+	UStaticMeshComponent *ClipMeshComponent;
+
 	virtual void Setup() override;
 };

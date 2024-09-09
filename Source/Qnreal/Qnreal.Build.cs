@@ -3,9 +3,9 @@
 using System.IO;
 using UnrealBuildTool;
 
-public class QImp : ModuleRules
+public class Qnreal : ModuleRules
 {
-	public QImp(ReadOnlyTargetRules Target) : base(Target)
+	public Qnreal(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		CppStandard = CppStandardVersion.Cpp20;

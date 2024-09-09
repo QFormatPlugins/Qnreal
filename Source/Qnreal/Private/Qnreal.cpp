@@ -1,15 +1,15 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "QImp.h"
+#include "Qnreal.h"
 
-#define LOCTEXT_NAMESPACE "FQImpModule"
+#define LOCTEXT_NAMESPACE "FQnrealModule"
 
-void FQImpModule::StartupModule()
+void FQnrealModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 }
 
-void FQImpModule::ShutdownModule()
+void FQnrealModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
@@ -17,4 +17,4 @@ void FQImpModule::ShutdownModule()
 
 #undef LOCTEXT_NAMESPACE
 	
-IMPLEMENT_MODULE(FQImpModule, QImp)
+IMPLEMENT_MODULE(FQnrealModule, Qnreal)

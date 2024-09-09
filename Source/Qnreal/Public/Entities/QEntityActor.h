@@ -3,20 +3,21 @@
 #include <CoreMinimal.h>
 #include "QEntityActor.generated.h"
 
-
 USTRUCT()
-struct QIMP_API FQEntityProperty
+struct QNREAL_API FQEntityProperty
 {
 	GENERATED_BODY()
-	UPROPERTY(VisibleAnywhere) FString Key;
-	UPROPERTY(VisibleAnywhere) FString Value;
+	UPROPERTY(VisibleAnywhere)
+	FString Key;
+	UPROPERTY(VisibleAnywhere)
+	FString Value;
 };
 
 USTRUCT(Blueprintable, BlueprintType)
 struct FQEntityData
 {
 	GENERATED_BODY()
-	
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	FName EntityName;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
@@ -28,26 +29,25 @@ struct FQEntityData
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	float Angle;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	TMap<FString,FString> Properties;
+	TMap<FString, FString> Properties;
 };
 
-
 UINTERFACE(Blueprintable, BlueprintType)
-class QIMP_API UQEntityEvents : public UInterface
+class QNREAL_API UQEntityEvents : public UInterface
 {
 	GENERATED_BODY()
 };
 
-class QIMP_API IQEntityEvents
+class QNREAL_API IQEntityEvents
 {
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable,  Category = "QUnreal")
-	void OnEntityGotTriggered(AActor* OtherActor, AQEntityActor* TriggerActor);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "QUnreal")
+	void OnEntityGotTriggered(AActor *OtherActor, AQEntityActor *TriggerActor);
 };
 
-UCLASS(ClassGroup=(Custom), Blueprintable, BlueprintType, meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup = (Custom), Blueprintable, BlueprintType, meta = (BlueprintSpawnableComponent))
 class UQEntityComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -59,13 +59,13 @@ public:
 };
 
 UCLASS(Blueprintable)
-class QIMP_API AQEntityActor : public AActor, public IQEntityEvents
+class QNREAL_API AQEntityActor : public AActor, public IQEntityEvents
 {
-		GENERATED_BODY()
+	GENERATED_BODY()
 public:
 	AQEntityActor();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, DisplayName="QUnreal Entity Component")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, DisplayName = "QUnreal Entity Component")
 	UQEntityComponent *EntityComponent;
 	virtual void Setup();
 };
