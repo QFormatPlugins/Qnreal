@@ -37,6 +37,17 @@ void FQnrealEDModule::StartupModule()
 					nullptr));
 			Options->bIsInitialized = true;
 		}
+
+		if (Options->MapAssetOptions.EntityClassOverrides == nullptr)
+		{
+			Options->MapAssetOptions.EntityClassOverrides = static_cast<UQEntityClassesData*>(
+				StaticLoadObject(UQEntityClassesData::StaticClass(),
+					nullptr,
+					TEXT("/Qnreal/DefaultEntityClasses"),
+					nullptr,
+					LOAD_None,
+					nullptr));
+		}
 		
 	}
 	

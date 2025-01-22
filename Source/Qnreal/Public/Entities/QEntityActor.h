@@ -27,7 +27,7 @@ struct FQEntityData
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	FString Message;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	float Angle;
+	float Angle = 0;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	TMap<FString, FString> Properties;
 };
