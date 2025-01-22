@@ -321,14 +321,14 @@ void UQuakeMapAsset::PostInitProperties()
 	UObject::PostInitProperties();
 }
 
-void UQuakeMapAsset::GetAssetRegistryTags(TArray<FAssetRegistryTag>& OutTags) const
+void UQuakeMapAsset::GetAssetRegistryTags(FAssetRegistryTagsContext Context) const
 {
 	if (AssetImportData)
 	{
-		OutTags.Add(FAssetRegistryTag(SourceFileTagName(), AssetImportData->GetSourceData().ToJson(),
+		Context.AddTag(FAssetRegistryTag(SourceFileTagName(), AssetImportData->GetSourceData().ToJson(),
 		                              FAssetRegistryTag::TT_Hidden));
 	}
-	UObject::GetAssetRegistryTags(OutTags);
+	UObject::GetAssetRegistryTags(Context);
 }
 
 void UQuakeMapAsset::Serialize(FArchive& Ar)
