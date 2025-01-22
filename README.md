@@ -4,7 +4,7 @@
 ![Trans Rights][badge-trans]
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-### Quake (Trenchbroom) Map and WAD importer for Unreal Eninge 5.
+### Quake (Trenchbroom) Map and WAD importer for Unreal Engine 5.
 
 <img src="https://github.com/QFormatPlugins/Qnreal/blob/main/.media/logo.png?raw=true" alt="qunreal_logo" width="60%" height=60%/>
 
