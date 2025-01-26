@@ -10,6 +10,15 @@ AQSolidEntityActor::AQSolidEntityActor()
 	ClipMeshComponent->bHiddenInGame = true;
 	ClipMeshComponent->SetVisibility(false);
 	ClipMeshComponent->SetActive(false);
+
+	ClipMeshComponent->bCastDistanceFieldIndirectShadow = false;
+	ClipMeshComponent->bCastStaticShadow = false;
+	ClipMeshComponent->bCastContactShadow = false;
+	ClipMeshComponent->bCastDynamicShadow = false;
+	ClipMeshComponent->bCastCinematicShadow = false;
+	ClipMeshComponent->bForceDisableNanite = true;
+	
+	
 	PrimaryActorTick.bCanEverTick = false;
 }
 
@@ -27,8 +36,8 @@ void AQSolidEntityActor::Setup()
 		EntityMeshComponent->UnregisterComponent();
 	}
 	
-
-	if (ClipMeshComponent->GetStaticMesh() != nullptr && ClipMeshComponent->GetStaticMesh()->IsValidLowLevelFast() && ClipMeshComponent->GetStaticMesh()->IsSourceModelValid(0))
+	
+	if (ClipMeshComponent->IsValidLowLevel() && ClipMeshComponent->GetStaticMesh() != nullptr)
 	{
 		ClipMeshComponent->SetActive(true);
 		ClipMeshComponent->UpdateCollisionFromStaticMesh();
@@ -40,5 +49,6 @@ void AQSolidEntityActor::Setup()
 	} else
 	{
 		ClipMeshComponent->UnregisterComponent();
+		ClipMeshComponent->DestroyComponent();
 	}
 }

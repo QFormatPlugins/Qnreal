@@ -364,17 +364,19 @@ void UQuakeMapAsset::ConvertEntityToModel(const qformats::map::SolidEntityPtr& E
 
 	auto MapName = FPaths::GetBaseFilename(SourceQMapFile);
 
-	FString MeshName = GetUniqueEntityName(Entity.get()->ClassName());
+	FString MeshName;
+	if (!Entity->tbName.empty())
+	{
+		MeshName = GetUniqueEntityName(Entity->tbName.c_str());
+	} else
+	{
+		MeshName = GetUniqueEntityName(Entity.get()->ClassName());
+	}
 	OutEntity.UniqueClassName = FString(MeshName);
 	FString PackagePath = this->GetPackage()->GetPathName();
 
 	if (bImportAsStaticMeshLib || bExport)
 	{
-		if (!Entity->tbName.empty())
-		{
-			MeshName = GetUniqueEntityName(Entity->tbName.c_str());
-		}
-
 		PackagePath = FPaths::GetPath(this->GetPathName());
 		FString BaseName = FPaths::GetBaseFilename(this->GetPathName());
 		PackagePath = FPaths::Combine(PackagePath, BaseName + "_Meshes", MeshName);

@@ -12,6 +12,8 @@ AQWorldSpawnActor::AQWorldSpawnActor()
 	WorldSpawnClipMeshComponent->SetMobility(EComponentMobility::Static);
 	WorldSpawnClipMeshComponent->bHiddenInGame = true;
 	WorldSpawnClipMeshComponent->SetVisibility(false);
+
+	
 	PrimaryActorTick.bCanEverTick = false;
 }
 
@@ -144,17 +146,21 @@ void AQWorldSpawnActor::SetupMeshComponent() const
 			WorldSpawnMeshComponent->UnregisterComponent();
 		}
 
-		auto ClipMesh = WorldSpawnClipMeshComponent->GetStaticMesh();
-		if (ClipMesh && ClipMesh->IsValidLowLevelFast() && ClipMesh->IsSourceModelValid(0))
+		if (WorldSpawnClipMeshComponent->IsValidLowLevel())
 		{
-			WorldSpawnClipMeshComponent->SetMobility(EComponentMobility::Static);
-			WorldSpawnClipMeshComponent->SetStaticMesh(MapData->WorldSpawn.ClipMesh);
-			WorldSpawnClipMeshComponent->GetBodySetup()->CollisionTraceFlag = CTF_UseComplexAsSimple;
-			WorldSpawnClipMeshComponent->UpdateCollisionFromStaticMesh();
-			WorldSpawnClipMeshComponent->SetRelativeLocation(WorldSpawnMeshComponent->GetRelativeLocation());
-		} else
-		{
-			WorldSpawnClipMeshComponent->UnregisterComponent();
+			auto ClipMesh = WorldSpawnClipMeshComponent->GetStaticMesh();
+			if (ClipMesh && ClipMesh->IsValidLowLevelFast() && ClipMesh->IsSourceModelValid(0))
+			{
+				WorldSpawnClipMeshComponent->SetMobility(EComponentMobility::Static);
+				WorldSpawnClipMeshComponent->SetStaticMesh(MapData->WorldSpawn.ClipMesh);
+				WorldSpawnClipMeshComponent->GetBodySetup()->CollisionTraceFlag = CTF_UseComplexAsSimple;
+				WorldSpawnClipMeshComponent->UpdateCollisionFromStaticMesh();
+				WorldSpawnClipMeshComponent->SetRelativeLocation(WorldSpawnMeshComponent->GetRelativeLocation());
+			} else
+			{
+				WorldSpawnClipMeshComponent->UnregisterComponent();
+				WorldSpawnClipMeshComponent->DestroyComponent();
+			}			
 		}
 	}
 }
