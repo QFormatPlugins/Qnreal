@@ -7,6 +7,7 @@
 #include "Entities/QSolidEntityActor.h"
 #include "EditorFramework/AssetImportData.h"
 #include "Entities/QSolidTriggerActor.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 qformats::map::textureBounds UQuakeMapAsset::onTextureRequest(std::string name)
 {
@@ -321,6 +322,7 @@ void UQuakeMapAsset::PostInitProperties()
 	UObject::PostInitProperties();
 }
 
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 3
 void UQuakeMapAsset::GetAssetRegistryTags(FAssetRegistryTagsContext Context) const
 {
 	if (AssetImportData)
@@ -330,6 +332,7 @@ void UQuakeMapAsset::GetAssetRegistryTags(FAssetRegistryTagsContext Context) con
 	}
 	UObject::GetAssetRegistryTags(Context);
 }
+#endif
 
 void UQuakeMapAsset::Serialize(FArchive& Ar)
 {

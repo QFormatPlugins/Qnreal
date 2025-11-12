@@ -42,7 +42,9 @@ public:
 
 	// UObject interface
 	virtual void PostInitProperties() override;
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 3
 	virtual void GetAssetRegistryTags(FAssetRegistryTagsContext Context) const override;
+#endif
 	virtual void Serialize(FArchive &Ar) override;
 	// End of UObject interface
 #endif

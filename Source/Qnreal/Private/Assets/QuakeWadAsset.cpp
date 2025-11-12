@@ -94,7 +94,7 @@ UTexture2D* FWadManager::FindTexture(const FName Name)
 	{
 		for (const auto WadTex : Wad->Textures)
 		{
-			if (WadTex.OriginalName == Name && WadTex.Texture != nullptr && WadTex.Texture->IsValidLowLevelFast())
+			if (WadTex.OriginalName == Name.ToString() && WadTex.Texture != nullptr && WadTex.Texture->IsValidLowLevelFast())
 			{
 				TextureCache[Name.ToString()] = WadTex.Texture;
 				return WadTex.Texture;
